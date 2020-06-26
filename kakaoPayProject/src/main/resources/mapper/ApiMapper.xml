@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kakaoPay.dao.KakaoPayMapper">
+
+<insert id="insKakaoPaySend" parameterType="com.kakaoPay.vo.KakaoPaySendVo">
+INSERT INTO KAKAO_PAY_SEND
+(   roomId
+  , sendDt
+  , token
+  , sendAmt
+  , sendCnt
+  , sendTm
+  , userId
+)
+VALUES
+(   #{roomId}
+  , #{sendDt}
+  , #{token}
+  , #{sendAmt}
+  , #{sendCnt}
+  , #{sendTm}
+  , #{userId}
+)
+</insert>
+
+<insert id="insKakaoPaySendSub" parameterType="com.kakaoPay.vo.KakaoPaySendSubVo">
+INSERT INTO KAKAO_PAY_SEND_SUB
+(   roomId
+  , sendDt
+  , token
+  , subSeq
+  , recvAmt
+  , recvYn
+)
+VALUES
+(   #{roomId}
+  , #{sendDt}
+  , #{token}
+  , #{subSeq}
+  , #{recvAmt}
+  , 'N'
+)
+</insert>
+
+<select id="selKakaoPaySendRecv" parameterType="com.kakaoPay.vo.KakaoPaySendVo" resultType="com.kakaoPay.vo.KakaoPaySendVo">
+SELECT sendTm
+     , userId
+  FROM KAKAO_PAY_SEND t1
+ WHERE roomId  = #{roomId}
+   AND sendDt  = #{sendDt}
+   AND token   = #{token}
+   AND EXISTS ( SELECT roomId
+                  FROM KAKAO_PAY_SEND_SUB
+                 WHERE roomId  = t1.roomId
+                   AND sendDt  = t1.sendDt
+                   AND token   = t1.token
+                   AND recvYn  = 'N' )
+</select>
+
+<select id="selKakaoPaySendSubChk" resultType="String" parameterType="com.kakaoPay.vo.KakaoPaySendVo">
+SELECT roomId
+  FROM KAKAO_PAY_SEND_SUB
+ WHERE roomId      = #{roomId}
+   AND sendDt      = #{sendDt}
+   AND token       = #{token}
+   AND recvUserId  = #{recvUserId}
+   AND recvYn      = 'Y'
+</select>
+
+<update id="updKakaoPaySendSub" parameterType="com.kakaoPay.vo.KakaoPaySendSubVo">
+UPDATE KAKAO_PAY_SEND_SUB
+   SET recvYn      = 'Y'
+     , recvTm      = #{recvTm}
+     , recvUserId  = #{recvUserId}
+ WHERE roomId      = #{roomId}
+   AND sendDt      = #{sendDt}
+   AND token       = #{token}
+   AND recvYn      = 'N'
+ LIMIT 1
+</update>
+
+<select id="selKakaoPaySendSubRecvAmt" resultType="Integer" parameterType="com.kakaoPay.vo.KakaoPaySendVo">
+SELECT recvAmt
+  FROM KAKAO_PAY_SEND_SUB
+ WHERE roomId      = #{roomId}
+   AND sendDt      = #{sendDt}
+   AND token       = #{token}
+   AND recvUserId  = #{recvUserId}
+   AND recvYn      = 'Y'
+</select>
+
+<select id="selKakaoPaySend" resultType="com.kakaoPay.vo.KakaoPaySendVo" parameterType="com.kakaoPay.vo.KakaoPaySendVo">
+SELECT roomId
+     , sendDt
+     , token
+     , sendTm
+     , sendAmt
+     , sendDt
+     , (SELECT SUM(recvAmt)
+          FROM KAKAO_PAY_SEND_SUB
+         WHERE roomId  = t1.roomId
+           AND sendDt  = t1.sendDt
+           AND token    = t1.token
+           AND recvYn  = 'Y') AS SUCCES_AMT
+  FROM KAKAO_PAY_SEND     t1
+ WHERE roomId  = #{roomId}
+   AND token   = #{token}
+   AND sendDt <![CDATA[ >= #{inq_start_dt} ]]>
+   AND sendDt <![CDATA[ <= #{inq_end_dt}   ]]>
+   AND userId  = #{userId}
+</select>
+
+<select id="selKakaoPaySendSubList" resultType="com.kakaoPay.vo.KakaoPaySendSubVo" parameterType="com.kakaoPay.vo.KakaoPaySendSubVo">
+SELECT recvAmt
+     , recvUserId
+  FROM KAKAO_PAY_SEND_SUB
+ WHERE roomId  = #{roomId}
+   AND sendDt  = #{sendDt}
+   AND token   = #{token}
+   AND recvYn  = 'Y'
+</select>
+
+</mapper>
