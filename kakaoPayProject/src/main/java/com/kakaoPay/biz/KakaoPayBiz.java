@@ -136,24 +136,41 @@ public class KakaoPayBiz {
 			mapper.insKakaoPaySend(paySend);
 			
 			//-------------------------------
-			// 02. KAKAO_PAY_SEND_SUB Table 등록 (뿌린금액/뿌릴인원)
+			// 02. KAKAO_PAY_SEND_SUB Table 등록
 			//-------------------------------
-			int recv_amt = send_amt / send_cnt;
+			int in_amt = 0; // 뿌리고 있는 금액
 			int subSeq = 1;
-			for (int i=0 ; i<paySend.getSendCnt(); i++) {
+			for (int i=0 ; i<send_cnt; i++) {
+				int recv_amt = 0; // 받을 금액
 				
 				KakaoPaySendSubVo paySendSub = new KakaoPaySendSubVo();
 				paySendSub.setRoomId(paySend.getRoomId());
 				paySendSub.setSendDt(paySend.getSendDt());
 				paySendSub.setToken(token);
 				paySendSub.setSubSeq(UtilCommon.fillZeros(5, subSeq+""));
+				
+				// 마지막 뿌리기건 (뿌린금액 - 뿌리고 있는 금액)
+				if ( (i+1) == send_cnt ) {
+					recv_amt = send_amt-in_amt;
+				}
+				// (뿌린금액 - 뿌리고 있는 금액) 내에서 랜덤으로 받을 금액을 구한다
+				else {
+					recv_amt = (int)(Math.random() * (send_amt-in_amt)) + 1;
+				}
+				// 받을금액이 0보다 작거나, 뿌린금액이 뿌리고 있는 금액보다 작거나 같은 경우 받을금액 0원으로 세팅
+				if ( recv_amt < 0 || send_amt <= in_amt ) {
+					recv_amt = 0;
+				}
+				// 뿌리고 있는 금액 계산
+				in_amt = in_amt + recv_amt;
+
 				paySendSub.setRecvAmt(recv_amt);
 				paySendSub.setRecvYn("N");
 				mapper.insKakaoPaySendSub(paySendSub);
 
 				subSeq++;
 			}
-			
+
 			//-------------------------------
 			// 03. 응답전문 세팅
 			//-------------------------------

@@ -19,7 +19,7 @@ public class Constant {
 	final static public String  RLST_CD_9007   = "9007";  // token 미입력
 	final static public String  RLST_CD_9008   = "9008";  // 받아올 대상이 없습니다
 	final static public String  RLST_CD_9009   = "9009";  // 자신이 뿌린 건은 받아 올 수 없습니다
-	final static public String  RLST_CD_9010   = "9010";  // 뿌린건이 10분이 초과되었습니다
+	final static public String  RLST_CD_9010   = "9010";  // 10분이 초과된 뿌린건은 받을 수 없습니다
 	final static public String  RLST_CD_9011   = "9011";  // 뿌린건은 한번만 받아 올 수 있습니다
 	final static public String  RLST_CD_9012   = "9012";  // 조회된 내용이 없습니다
 	final static public String  RLST_CD_9999   = "9999";  // Exception 발생
@@ -34,7 +34,7 @@ public class Constant {
 	final static public String  RLST_MSG_9007  = "token 미입력";
 	final static public String  RLST_MSG_9008  = "받아올 대상이 없습니다";
 	final static public String  RLST_MSG_9009  = "자신이 뿌린 건은 받아 올 수 없습니다";
-	final static public String  RLST_MSG_9010  = "뿌린건이 10분이 초과되었습니다";
+	final static public String  RLST_MSG_9010  = "10분이 초과된 뿌린건은 받을 수 없습니다";
 	final static public String  RLST_MSG_9011  = "뿌린건은 한번만 받아 올 수 있습니다";
 	final static public String  RLST_MSG_9012  = "조회된 내용이 없습니다";
 	final static public String  RLST_MSG_9999  = "Exception 발생";
