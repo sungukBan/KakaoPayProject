@@ -262,7 +262,10 @@ public class KakaoPayBiz {
 			//-------------------------------
 			// 02. 받기완료
 			//-------------------------------
-			mapper.updKakaoPaySendSub(paySendSub);
+			if ( updKakaoPaySendSub(paySendSub) == 0 ) {
+				status.setAPIStatus(Constant.RLST_CD_9012, Constant.RLST_MSG_9012);
+				return jsonStr;
+			}
 			int recv_amt = mapper.selKakaoPaySendSubRecvAmt(paySendSub);
 			respnJson.put("RECV_AMT", recv_amt);
 
@@ -277,6 +280,11 @@ public class KakaoPayBiz {
 			e.printStackTrace();
 		}
 		return jsonStr;
+	}
+	
+	public synchronized int updKakaoPaySendSub(KakaoPaySendSubVo paySendSub) {
+		int updCnt = mapper.updKakaoPaySendSub(paySendSub);
+		return updCnt;
 	}
 	
 	public String doBiz103(HttpServletRequest request, String jsonStr, APIStatus status) {
@@ -327,7 +335,7 @@ public class KakaoPayBiz {
 			//-------------------------------
 			KakaoPaySendVo paySendData = mapper.selKakaoPaySend(paySend);
 			if ( paySendData == null ) {
-				status.setAPIStatus(Constant.RLST_CD_9012, Constant.RLST_MSG_9012);
+				status.setAPIStatus(Constant.RLST_CD_9013, Constant.RLST_MSG_9013);
 				return jsonStr;
 			}
 			
